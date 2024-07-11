@@ -3,6 +3,9 @@
 Use the socket transmission audio stream in NAO Robot.
 
 ## Requirment
+python 3.8+
+
+If you still need to use the nao robot other modules, please build libqi-python.
 
 ### Linux
 
