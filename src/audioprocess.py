@@ -7,6 +7,7 @@ import socket
 
 
 class SoundProcessingModule(object):
+    
     def __init__(self,app,client_socket):
         super(SoundProcessingModule, self).__init__()
         app.start()
@@ -18,10 +19,9 @@ class SoundProcessingModule(object):
         self.micFront = []
         self.module_name = "SoundProcessingModule"
         
-        self.singal=0 # 0 is stop(default),1 is ready, 2 is start, 3 is exit.
+        self.singal=0 # 0 is default,1 is start, 2 is stop, 3 is exit.
         self.isSubscribe = 0
         self.client_socket = client_socket
-
     def startProcessing(self):
         """
         Start processing
@@ -29,26 +29,23 @@ class SoundProcessingModule(object):
         while True:
             # Stop waiting for user signal
             self.singal = self.client_socket.recv(1)
-            if self.singal is None or self.singal == '':
-                self.singal = 0
-                continue
-            if self.singal == 0 and self.isSubscribe == 1:
-                self.audio_service.unsubscribe(self.module_name)
-                self.isProcessingDone = True
-                self.isSubscribe = 0
-            if self.singal == 0 and self.isSubscribe == 0:
-                self.isProcessingDone = True
-            if self.singal == 1:
+            
+            if self.singal == b'1':
                 # ask for the front microphone signal sampled at 16kHz
                 # if you want the 4 channels call setClientPreferences(self.module_name, 48000, 0, 0)
                 self.audio_service.setClientPreferences(self.module_name, 16000, 3, 0)
                 self.audio_service.subscribe(self.module_name)
-                self.isSubscribe = 1
-            if self.singal == 2:
-                self.isProcessingDone = False
-            if self.singal == 3:
+                self.isProcessingDone = True
+                self.singal == b'0'
+            if self.singal == b'2':
+                self.isProcessingDone = True
                 self.audio_service.unsubscribe(self.module_name)
+                self.singal == b'0'
+            if self.singal == b'3':
+                self.audio_service.unsubscribe(self.module_name)
+                self.singal == b'0'
                 break
+        return 1
     def processRemote(self, nbOfChannels, nbOfSamplesByChannel, timeStamp, inputBuffer):
         if self.isProcessingDone == False:
             self.client_socket.sendall(inputBuffer)
@@ -75,11 +72,20 @@ if __name__ == "__main__":
         sys.exit(1)
     
     singal_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    singal_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     singal_socket.bind((args.socketip, args.socketport))
     singal_socket.listen(1)
     client_socket, addr = singal_socket.accept()
-    
-    MySoundProcessingModule = SoundProcessingModule(app,client_socket)
-    app.session.registerService("SoundProcessingModule", MySoundProcessingModule)
-    MySoundProcessingModule.startProcessing()
+    isFinish=0
+    while isFinish==0:
+        try:
+            MySoundProcessingModule = SoundProcessingModule(app,client_socket)
+            app.session.registerService("SoundProcessingModule", MySoundProcessingModule)
+            isFinish=MySoundProcessingModule.startProcessing()
+        except BrokenPipeError:
+            client_socket, addr = singal_socket.accept()
+        except KeyboardInterrupt:
+            isFinish=1
+            break
+
     client_socket.close()
