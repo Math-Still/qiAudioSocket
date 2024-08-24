@@ -30,6 +30,5 @@ if __name__=="__main__":
         passAudioData(client_socket)
         if count > 10000:
             break
-    client_socket.sendall(b'0')
     time.sleep(1)
     client_socket.sendall(b'3')

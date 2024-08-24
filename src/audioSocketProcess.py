@@ -37,14 +37,16 @@ class SoundProcessingModule(object):
                 self.audio_service.subscribe(self.module_name)
                 self.isProcessingDone = True
                 self.singal == b'0'
-            if self.singal == b'2':
+            elif self.singal == b'2':
                 self.isProcessingDone = True
                 self.audio_service.unsubscribe(self.module_name)
                 self.singal == b'0'
-            if self.singal == b'3':
+            elif self.singal == b'3':
                 self.audio_service.unsubscribe(self.module_name)
                 self.singal == b'0'
                 break
+            else:
+                pass
         return 1
     def processRemote(self, nbOfChannels, nbOfSamplesByChannel, timeStamp, inputBuffer):
         if self.isProcessingDone == False:

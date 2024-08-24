@@ -28,7 +28,7 @@ client_socket.sendall(b'2')
 
 print("connected")
 # Send and receive data
-while count <= 30:
+while count <= 3000:
     data = count
     response = client_socket.recv(buffer_size)
     audio_data = response
