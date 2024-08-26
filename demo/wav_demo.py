@@ -23,7 +23,6 @@ client_socket.connect((HOST, PORT))
 count = 0
 client_socket.sendall(b'1')
 time.sleep(1)
-client_socket.sendall(b'2')
 
 
 print("connected")
@@ -39,3 +38,5 @@ while count <= 3000:
         wav_file.setframerate(sample_rate)
         wav_file.writeframes(audio_data)
     # Generate test WAV stream
+client_socket.sendall(b'2')
+client_socket.close()

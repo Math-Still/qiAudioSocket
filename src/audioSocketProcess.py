@@ -35,7 +35,7 @@ class SoundProcessingModule(object):
                 # if you want the 4 channels call setClientPreferences(self.module_name, 48000, 0, 0)
                 self.audio_service.setClientPreferences(self.module_name, 16000, 3, 0)
                 self.audio_service.subscribe(self.module_name)
-                self.isProcessingDone = True
+                self.isProcessingDone = False
                 self.singal == b'0'
             elif self.singal == b'2':
                 self.isProcessingDone = True
@@ -84,8 +84,8 @@ if __name__ == "__main__":
             MySoundProcessingModule = SoundProcessingModule(app,client_socket)
             app.session.registerService("SoundProcessingModule", MySoundProcessingModule)
             isFinish=MySoundProcessingModule.startProcessing()
-        except BrokenPipeError:
-            client_socket, addr = singal_socket.accept()
+        # except BrokenPipeError:
+        #     client_socket, addr = singal_socket.accept()
         except KeyboardInterrupt:
             isFinish=1
             break
