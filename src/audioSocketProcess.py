@@ -8,7 +8,6 @@ import socket
 
 class SoundProcessingModule(object):
     def ledsOn(self):
-        global isLedsOn
         self.isLedsOn = True
         # leds.rotateEyes(0xFFF00, 1, 15, _async=True)
         self.leds.fadeRGB('FaceLeds', 0, 1, 0, 0.1)
