@@ -18,7 +18,7 @@ class SoundProcessingModule(object):
         # Get the service ALAudioDevice.
         self.audio_service = session.service("ALAudioDevice")
         self.leds_service = session.service("ALLeds")
-        self.ledsOn = False
+        self.isledsOn = False
         self.isProcessingDone = True
         self.framesCount=0
         self.micFront = []
@@ -41,14 +41,14 @@ class SoundProcessingModule(object):
                 self.audio_service.setClientPreferences(self.module_name, 16000, 3, 0)
                 self.audio_service.subscribe(self.module_name)
                 self.isProcessingDone = False
-                if not isLedsOn:
+                if not self.isLedsOn:
                     self.ledsOn()
                     self.isLedsOn = True
                 self.singal == b'0'
                 
             elif self.singal == b'2':
                 self.isProcessingDone = True
-                if isLedsOn:
+                if self.isLedsOn:
                     self.leds.reset('FaceLeds')
                     self.isLedsOn = False
                 self.audio_service.unsubscribe(self.module_name)
