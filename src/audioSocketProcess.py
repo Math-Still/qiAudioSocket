@@ -7,13 +7,19 @@ import socket
 
 
 class SoundProcessingModule(object):
-    
+    def ledsOn(self):
+        global isLedsOn
+        self.isLedsOn = True
+        # leds.rotateEyes(0xFFF00, 1, 15, _async=True)
+        self.leds.fadeRGB('FaceLeds', 0, 1, 0, 0.1)
     def __init__(self,app,client_socket):
         super(SoundProcessingModule, self).__init__()
         app.start()
         session = app.session
         # Get the service ALAudioDevice.
         self.audio_service = session.service("ALAudioDevice")
+        self.leds_service = session.service("ALLeds")
+        self.ledsOn = False
         self.isProcessingDone = True
         self.framesCount=0
         self.micFront = []
@@ -36,11 +42,19 @@ class SoundProcessingModule(object):
                 self.audio_service.setClientPreferences(self.module_name, 16000, 3, 0)
                 self.audio_service.subscribe(self.module_name)
                 self.isProcessingDone = False
+                if not isLedsOn:
+                    self.ledsOn()
+                    self.isLedsOn = True
                 self.singal == b'0'
+                
             elif self.singal == b'2':
                 self.isProcessingDone = True
+                if isLedsOn:
+                    self.leds.reset('FaceLeds')
+                    self.isLedsOn = False
                 self.audio_service.unsubscribe(self.module_name)
                 self.singal == b'0'
+                
             elif self.singal == b'3':
                 self.audio_service.unsubscribe(self.module_name)
                 self.singal == b'0'
